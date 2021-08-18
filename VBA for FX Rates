@@ -1,0 +1,63 @@
+'Declaring variables
+Dim DataLocationRef As String
+
+If Right(FilePath, 1) <> "\" Then FilePath = FilePath & "\"
+
+'Creating file reference
+DataLocationRef = "'" & FilePath & FileName & "'!" & RangeName
+
+Debug.Print DataLocationRef
+
+'Set Function valuye to the value from another file
+GetSingleValue = ExecuteExcel4Macro(DataLocationRef)
+
+
+End Function
+
+
+Sub UpdateAssumptions()
+'This subroutine will collect the assumption location from the worksheet
+'and then fetch the data from the assumption workbook
+
+
+'Variable Definition
+Dim FilePath As String
+Dim FileName As String
+Dim RangeName As String
+Dim NewRate As Double
+
+Dim Currencies As Variant
+Currencies = Array("EUR", "GBP", "CAD", "CHF")
+
+Dim CurrencyCode As Variant
+
+'Get assumptions location from our assumptions sheet in Excel
+FilePath = ws_Assumptions.Range("Rates_FilePath").Value
+FileName = ws_Assumptions.Range("Rates_FileName").Value
+
+
+For Each CurrencyCode In Currencies
+
+        'do a set of action
+        RangeName = "USDper" & CurrencyCode & "_Source"
+        
+        'Retrieve exchange rate from the other file
+        NewRate = GetSingleValue(FilePath, FileName, RangeName)
+        
+        'Paste data into this workbook
+        ws_Assumptions.Range("USDper" & CurrencyCode).Value = NewRate
+
+Next CurrencyCode
+
+
+
+'Inform the user of success/ failure
+MsgBox "The rates has been updated."
+
+
+
+
+
+
+
+End Sub
